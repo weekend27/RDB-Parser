@@ -37,7 +37,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE. */
 
+
 #include <stdint.h>
+
 
 static const uint64_t crc64_tab[256] = {
     UINT64_C(0x0000000000000000), UINT64_C(0x7ad870c830358979),
@@ -170,36 +172,38 @@ static const uint64_t crc64_tab[256] = {
     UINT64_C(0x536fa08fdfd90e51), UINT64_C(0x29b7d047efec8728),
 };
 
-uint64_t crc64(uint64_t crc, const unsigned char *s, uint64_t l) {
+uint64_t crc64(uint64_t crc, const unsigned char *s, uint64_t len) {
     uint64_t j;
 
-    for (j = 0; j < l; j++) {
+    for (j = 0; j < len; ++j) {
         uint8_t byte = s[j];
         crc = crc64_tab[(uint8_t)crc ^ byte] ^ (crc >> 8);
     }
     return crc;
 }
 
-/* Test main */
+/* TEST main */
 #ifdef TEST_MAIN
 #include <stdio.h>
 int main(int argc, char* argv[]) {
-    if(argc < 2) {
+    /* Note that: argv includes the .o file */
+    if (argc < 2) {
+        /* have a simple test here :) */
         printf("e9c6d914c4b8d9ca == %016llx\n",
             (unsigned long long) crc64(0,(unsigned char*)"123456789",9));
         printf("Usage: crc64 [filename] [max_read_len]\n");
         return 0;
     }
 
+    /* size_t is defined in the C standard library, it should be unsigned int，in the 64-bit system, it should be long unsigned int */
     size_t total_len = -1;
-    if(argc > 2)
-    {
-        total_len = atoll(argv[2]);
+    if (argc > 2) {
+        total_len = atoll(argv[2]);  /* atoll: parses the C-string str interpreting its content as an integral number, which is returned as a value of type long long int. */
     }
 
-    uint64_t cksum = 0;
-    char* filename = argv[1];
-    char buf[409600];
+    uint64_t checksum = 0;
+    char * filename = argv[1];
+    char buf[409600]; /* 400 MB */
     size_t len = 0;
     size_t tmp = 0;
     FILE* fp = fopen(filename, "r");
@@ -208,23 +212,27 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    while(!feof(fp)) {
-        if(len == total_len) break;
-        tmp = total_len ? total_len - len: sizeof(buf);
-        if(tmp > sizeof(buf))
-        {
+    /* feof: Checks whether the end-of-File indicator associated with stream is set, returning a value different from zero if it is. */
+    while (!feof(fp)) {
+        if (len == total_len) break;
+        /* if total_len == 0, tmp = sizeof(buf), else: tmp = total_len - len */
+        tmp = total_len ? total_len - len : sizeof(buf);
+        if (tmp > sizeof(buf)) {
             tmp = sizeof(buf);
+            // printf("inside tmp = %d\n", (int)tmp);
         }
-        tmp = fread(buf, 1, tmp,fp);
-        if(tmp >= 0)
-        {
-            cksum = crc64(cksum,buf,tmp);
+        /* fread: Reads an array of count elements, each one with a size of size bytes, from the stream and stores them in the block of memory specified by ptr. */
+        tmp = fread(buf, 1, tmp, fp);
+        // printf("read length = %d\n", (int)tmp);
+        if (tmp >= 0) {
+            checksum = crc64(checksum, buf, tmp);
             len += tmp;
         }
     }
 
     fclose(fp);
-    printf("%016llx\t%s\n", cksum, filename);
+    printf("%016llx\t%s\n", (unsigned long long)checksum, filename);
     return 0;
 }
+
 #endif
