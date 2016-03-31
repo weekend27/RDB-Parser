@@ -1,5 +1,5 @@
-#ifndef __ENDIAN_H
-#define __ENDIAN_H
+#ifndef _ENDIAN_H_
+#define _ENDIAN_H_
 
 void memrev16(void *p);
 void memrev32(void *p);
@@ -7,6 +7,7 @@ void memrev64(void *p);
 
 /* variants of the function doing the actual convertion onlu if the target host is big endian */
 /* redis RDB file data is saved in little-endian format*/
+/* if BYTE_ORDER is LITTLE_ENDIAN, do nothing:) */
 #if (BYTE_ORDER == LITTLE_ENDIAN)
 #define memrev16ifbe(p)
 #define memrev32ifbe(p)
