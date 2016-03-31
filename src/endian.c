@@ -11,7 +11,6 @@ void memrev16(void *p) {
         x[i+1] = x[i] ^ x[i+1];
         x[i] = x[i] ^ x[i+1];
     }
-
 }
 
 
