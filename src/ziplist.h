@@ -18,6 +18,16 @@
 #define ZIP_ENC_STR_14B (1 << 6)
 #define ZIP_ENC_STR_32B (2 << 6)
 
+#define ZIP_ENC_INT8  0xfe
+#define ZIP_ENC_INT16 0xc0
+#define ZIP_ENC_INT24 0xf0
+#define ZIP_ENC_INT32 0xd0
+#define ZIP_ENC_INT64 0xe0
+
+#define ZIP_ENC_STR_6B  (0 << 6)
+#define ZIP_ENC_STR_14B (1 << 6)
+#define ZIP_ENC_STR_32B (2 << 6)
+
 #define ZIP_ENC_STR_MASK 0xc0
 #define ZIP_IS_END(entry) ((uint8_t)entry[0] == ZIPLIST_END)
 #define ZL_BYTES(zl) *((uint32_t*)(zl))

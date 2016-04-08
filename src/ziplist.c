@@ -16,7 +16,7 @@ uint8_t ziplist_entry_is_str(const char *entry) {
     uint8_t enc;
     enc = (uint8_t)entry[ziplist_prev_len_size(entry)];
     enc &= ZIP_ENC_STR_MASK;
-    if (enc == ZIP_ENC_STR_06B || enc == ZIP_ENC_STR_14B || ZIP_ENC_STR_32B) {
+    if (enc == ZIP_ENC_STR_06B || enc == ZIP_ENC_STR_14B || enc == ZIP_ENC_STR_32B) {
         return 1;
     } else {
         return 0;
@@ -112,36 +112,37 @@ uint8_t ziplist_entry_int(const char *entry, int64_t *v) {
     char *content;
 
     pre_len_size = ziplist_prev_len_size(entry);
-    content = (char *)entry + pre_len_size + 1;
+    content = (char *)entry + pre_len_size;
     enc = entry[pre_len_size];
 
+    // add one byte for encode.
     if (enc == ZIP_ENC_INT08B) {
-        memcpy(&v8, content, sizeof(int8_t))；
+        memcpy(&v8, content + 1, sizeof(int8_t));
         *v = v8;
     } else if (enc == ZIP_ENC_INT16B) {
-        memcpy(&v16, content, sizeof(int16_t));
+        memcpy(&v16, content + 1, sizeof(int16_t));
         memrev16ifbe(&v16);
         *v = v16;
     } else if (enc == ZIP_ENC_INT24B) {
-        memcpy(&v32, content, 3);
+        memcpy(&v32, content + 1, 3);
         memrev32ifbe(&v32);
         *v = v32;
     } else if (enc == ZIP_ENC_INT32B) {
-        memcpy(&v32, content, sizeof(int32_t));
+        memcpy(&v32, content + 1, sizeof(int32_t));
         memrev32ifbe(&v32);
         *v = v32;
-    } else if (enc == ZIP_ENC_INT64B) {
-        memcpy(&v64, content, sizeof(int64_t));
+    } else if (enc == ZIP_ENC_INT64B){
+        memcpy(&v64, content + 1, sizeof(int64_t));
         memrev64ifbe(&v64);
         *v = v64;
-    } else if ((enc & 0xf0) == 0xf0) {
-        v8 = enc & 0x0f;
+    } else if ((enc & 0xf0) == 0xf0){
+        v8 = content[0] & 0x0f;
         *v = v8;
     } else {
         return 0;
     }
 
-    return 1;
+    return  1;
 }
 
 void push_ziplist_list_or_set (lua_State *L, const char *zl) {
@@ -178,7 +179,7 @@ void push_ziplist_hash_or_zset(lua_State *L, const char *zl) {
                     str = ll2string(v);
                 }
             }
-            if (i = 0) {
+            if (i == 0) {
                 key = str;
             } else {
                 val = str;
@@ -198,7 +199,7 @@ void ziplist_dump(const char *zl) {
 
     printf("ziplist { \n");
     printf("bytes: %u\n", ZL_BYTES(zl));
-    printf("len: %u\n", ZIL_LEN(zl));
+    printf("len: %u\n", ZL_LEN(zl));
     len = ZL_LEN(zl);
     entry = (char *)ZL_ENTRY(zl);
     while (!ZIP_IS_END(entry)) {
@@ -211,7 +212,7 @@ void ziplist_dump(const char *zl) {
         } else {
             int64_t v;
             if (ziplist_entry_int(entry, &v) > 0) {
-                printf("int value: %lld\n", v);
+                printf("int value: %lld\n", (long long int)v);
             }
         }
         entry += ziplist_entry_size(entry);

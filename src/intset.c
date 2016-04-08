@@ -37,7 +37,7 @@ void intset_dump(intset *is) {
     printf("element {\t");
     for (i = 0; i < is->length; ++i) {
         intset_get(is, i, &v);
-        printf("%lld\t", v);
+        printf("%lld\t", (long long int)v);
     }
     printf("}\n");
 }

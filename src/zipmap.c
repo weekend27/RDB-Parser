@@ -74,7 +74,7 @@ void push_zipmap(lua_State *L, const char *zm) {
 }
 
 /* confusing what if size == 5? */
-void zipmap_dump(const char *entry) {
+void zipmap_dump(const char *zm) {
     int i = 0, len , klen, vlen;
     char *key, *val;
 

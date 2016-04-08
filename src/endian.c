@@ -3,8 +3,9 @@
 /* Toggle the 16 bit unsigned integer pointed by *p from little endian to big endian */
 void memrev16(void *p) {
     unsigned char *x = p;
+    const char *t = p;
 
-    int len = strlen(x);
+    int len = strlen(t);
     int i;
     for (i = 0; i < len - 1; i += 2) {
         x[i] = x[i] ^ x[i+1];
@@ -17,8 +18,10 @@ void memrev16(void *p) {
 /* Toggle the 32 bit unsigned integer pointed by *p from little endian to big endian */
 void memrev32(void *p) {
     unsigned char *x = p;
+    const char *t = p;
 
-    int len = strlen(x);
+    int len = strlen(t);
+
     int i;
     for (i = 0; i < len - 3; i += 4) {
         x[i] = x[i] ^ x[i+3];
@@ -35,8 +38,9 @@ void memrev32(void *p) {
 /* Toggle the 64 bit unsigned integer pointed by *p from little endian to big endian */
 void memrev64(void *p) {
     unsigned char *x = p;
+    const char *t = p;
 
-    int len = strlen(x);
+    int len = strlen(t);
     int i;
     for (i = 0; i < len - 7; i += 8) {
         x[i] = x[i] ^ x[i+7];

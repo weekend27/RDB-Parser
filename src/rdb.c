@@ -447,24 +447,24 @@ int rdb_load(lua_State *L, const char *path) {
             script_need_gc(L);
         }
         free(key);
-
-        if (version >= MAGIC_VERSION) {
-            rdb_check_crc(rdb_fd, checksum);
-        }
-
-        if (version >= MAGIC_VERSION) rdb_check_crc(rdb_fd, cksum);
-
-        struct stat st;
-        if(fstat(rdb_fd, &st) != 0) {
-            logger(ERROR, "fstat error when load rdb file, as %s.", strerror(errno));
-        }
-
-        if(st.st_size != loaded_bytes) {
-            logger(ERROR, "Load rdb file failed, Bytes is %llu, expected is %llu version %d",
-                    loaded_bytes, st.st_size, version);
-        }
-
-        close(rdb_fd);
-        return 0;
     }
+    
+    if (version >= MAGIC_VERSION) {
+        rdb_check_crc(rdb_fd, checksum);
+    }
+
+    if (version >= MAGIC_VERSION) rdb_check_crc(rdb_fd, checksum);
+
+    struct stat st;
+    if(fstat(rdb_fd, &st) != 0) {
+        logger(ERROR, "fstat error when load rdb file, as %s.", strerror(errno));
+    }
+
+    if(st.st_size != loaded_bytes) {
+        logger(ERROR, "Load rdb file failed, Bytes is %llu, expected is %llu version %d",
+                loaded_bytes, st.st_size, version);
+    }
+
+    close(rdb_fd);
+    return 0;
 }
