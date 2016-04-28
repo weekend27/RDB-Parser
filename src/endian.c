@@ -1,4 +1,24 @@
+// #define TEST_MAIN 1
+
 #include <string.h>
+
+typedef int bool;
+enum {false, true};
+
+
+/* judge the machine storage method: little endian or big endian */
+bool isBigEndian() {
+    union NUM {
+        int a;
+        char b;
+    }num;
+    num.a = 0x1234;
+    if (num.b == 0x12) {
+        return true;
+    }
+    return false;
+}
+
 
 /* Toggle the 16 bit unsigned integer pointed by *p from little endian to big endian */
 void memrev16(void *p) {
@@ -66,6 +86,12 @@ void memrev64(void *p) {
 #include <stdio.h>
 
 int main() {
+    if (isBigEndian()) {
+        printf("BigEndian\n");
+    } else {
+        printf("LittleEndian\n");
+    }
+
     char buf[16];
     char *s = "abcdefghijklmnop";
     int len = strlen(s);
